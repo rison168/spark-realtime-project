@@ -3,6 +3,7 @@ package com.rsion.spark.realtime.util
 import java.util.Properties
 
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.internals.Topic
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -12,11 +13,31 @@ import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, Loca
 
 /**
  * @author : Rison 2021/6/3 上午8:38
- *获取kafka的工具类
+ *发送、获取kafka的工具类
  */
 object KafkaUtil {
   private val properties: Properties = MyPropertiesUtil.load("config.properties")
   val broker_list = properties.getProperty("kafka.broker.list")
+  var kafkaProducer: KafkaProducer[String, String] = null
+
+  /**
+   * 创建kafka生产者
+   * @return
+   */
+  def createKafkaProducer(): KafkaProducer[String, String] = {
+    val properties = new Properties()
+    properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    properties.put("enable.idempotence",(true: java.lang.Boolean))
+    var producer: KafkaProducer[String, String] = null
+    try
+      producer = new KafkaProducer[String, String](properties)
+    catch {
+      case e: Exception => e.printStackTrace()
+    }
+    producer
+  }
+
   var kafkaParams = collection.mutable.Map(
     "bootstrap.servers" -> broker_list,//用于初始化链接到集群的地址
     "key.deserializer" -> classOf[StringDeserializer],
@@ -80,5 +101,34 @@ object KafkaUtil {
     )
     dStream
   }
+
+  /**
+   * kafka发送数据
+   * @param topic
+   * @param msg
+   * @return
+   */
+  def send(topic: String, msg: String) = {
+    if (kafkaProducer == null) {
+      kafkaProducer = createKafkaProducer()
+    }
+    kafkaProducer.send(new ProducerRecord[String, String](topic, msg))
+  }
+
+  /**
+   * kafka发送数据
+   * @param topic
+   * @param msg
+   * @param key
+   * @return
+   */
+  def send(topic: String, msg: String, key: String) = {
+    if (kafkaProducer == null) {
+      kafkaProducer = createKafkaProducer()
+    }
+    kafkaProducer.send(new ProducerRecord[String, String](topic,key,msg))
+  }
+
+
 
 }
