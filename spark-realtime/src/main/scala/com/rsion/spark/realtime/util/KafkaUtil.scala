@@ -43,7 +43,7 @@ object KafkaUtil {
     "key.deserializer" -> classOf[StringDeserializer],
     "value.deserializer" -> classOf[StringDeserializer],
     //用于标识这个消费者属于哪个消费团体
-    "group.id" -> "gmall0523_group",
+    "group.id" -> "test_group",
     //latest自动重置偏移量为最新的偏移量
     "auto.offset.reset" -> "latest",
     //如果是true，则这个消费者的偏移量会在后台自动提交,但是kafka宕机容易丢失数据
