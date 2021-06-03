@@ -50,6 +50,7 @@ object KafkaUtil {
    * 创建DStream, 返回输入的数据，使用指定的的消费组
    * @param ssc
    * @param topic
+   * @param groupId
    * @return
    */
   def getKafkaStream(ssc: StreamingContext, topic: String, groupId: String) = {
@@ -66,6 +67,8 @@ object KafkaUtil {
    * 创建DStream, 返回输入的数据，使用指定的的消费组, 从指定的偏移量读取
    * @param ssc
    * @param topic
+   * @param groupId
+   * @param offsets
    * @return
    */
   def getKafkaStream(ssc: StreamingContext, topic: String, groupId: String, offsets: Map[TopicPartition, Long]) = {
